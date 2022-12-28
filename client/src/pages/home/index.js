@@ -7,10 +7,8 @@ const Home = ({ username, setUsername, room, setRoom, socket }) => {
     if (room !== '' && username !== '') {
       socket.emit('join_room', { username, room });
     }
-    navigate('/chat', { replace: true });
+    navigate('../chat', { replace: true });
   };
-  
-  
   
   return (
     <div className={styles.container}>
@@ -31,7 +29,7 @@ const Home = ({ username, setUsername, room, setRoom, socket }) => {
           <option value='react'>React</option>
         </select>
 
-        <button className='btn btn-secondary' style={{ width: '100%' }}>Join Room</button>
+        <button className='btn btn-secondary' onClick={joinRoom} style={{ width: '100%' }}>Join Room</button>
       </div>
     </div>
   );
