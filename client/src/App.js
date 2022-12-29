@@ -9,7 +9,15 @@ const socket = io.connect('http://localhost:4000');
 
 function App() {
   const [username, setUsername] = useState('');
+  const [role, setRole] = useState(newRole);
   const [room, setRoom] = useState('');
+
+
+  function newRole() { 
+    const role = "mafia";
+    const selectedRole = role[Math.floor(Math.random() * role.length)];
+    return role;
+  }
 
   return (
     <Router>
@@ -22,6 +30,8 @@ function App() {
                 username={username}
                 setUsername={setUsername}
                 room={room}
+                role={role}
+                setRole={setRole}
                 setRoom={setRoom}
                 socket={socket}
               />

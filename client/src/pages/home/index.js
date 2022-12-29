@@ -5,11 +5,20 @@ const Home = ({ username, setUsername, room, setRoom, socket }) => {
   const navigate = useNavigate();
   const joinRoom = () => {
     if (room !== '' && username !== '') {
-      socket.emit('join_room', { username, room });
+      const role = setRole();
+      console.log(username + " " + "role is: " + role);
+      socket.emit('join_room', { username, room, role });
     }
     navigate('../chat', { replace: true });
   };
-  
+
+ 
+  function setRole() { 
+    const role = ["mafia", "volk"];
+    const selectedRole = role[Math.floor(Math.random() * role.length)];
+    return selectedRole;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.formContainer}>
@@ -29,7 +38,7 @@ const Home = ({ username, setUsername, room, setRoom, socket }) => {
           <option value='react'>React</option>
         </select>
 
-        <button className='btn btn-secondary' onClick={joinRoom} style={{ width: '100%' }}>Join Room</button>
+        <button className='btn btn-secondary' onClick={() => {joinRoom(); setRole();}} style={{ width: '100%' }}>Join Room</button>
       </div>
     </div>
   );

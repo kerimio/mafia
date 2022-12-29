@@ -6,6 +6,7 @@ const cors = require('cors');
 const { Server } = require('socket.io')
 const harperSaveMessage = require('./services/harper-save-message');
 const harperGetMessages = require('./services/harper-get-messages'); 
+const leaveRoom = require('./utills/leave-room'); // Add this
 
 app.use(cors()); // Add cors middleware
 const server = http.createServer(app); 
@@ -21,6 +22,7 @@ const io = new Server(server, {
   // Add this
   let chatRoom = ''; // E.g. javascript, node,...
   let allUsers = []; // All users in current chat room 
+  let allRoles = []; // All roles in current chat room
   
 
   // Listen for when the client connects via socket.io-client
@@ -29,9 +31,22 @@ const io = new Server(server, {
   
     // Add a user to a room
     socket.on('join_room', (data) => {
-      const { username, room } = data; // Data sent from client when join_room event emitted
+
+      
+      let { username, room, role } = data; // Data sent from client when join_room event emitted
+      console.log("data:, ", data);
+      console.log("role: ", role);
+      if (allRoles.length==0) {
+        allRoles.push(role);
+      }
+      else if (allRoles.includes("mafia")){
+        role = "mafia";
+        allRoles.push(role);
+      }
       socket.join(room); // Join the user to a socket room
-  
+      
+
+      console.log(data);
       // Add this
       let __createdtime__ = Date.now(); // Current timestamp
       // Send message to all users currently in the room, apart from the user that just joined
@@ -48,7 +63,7 @@ const io = new Server(server, {
       });
 
       chatRoom = room;
-      allUsers.push({ id: socket.id, username, room });
+      allUsers.push({ id: socket.id, username, role, room });
       chatRoomUsers = allUsers.filter((user) => user.room === room);
       socket.to(room).emit('chatroom_users', chatRoomUsers);
       socket.emit('chatroom_users', chatRoomUsers);
@@ -90,6 +105,7 @@ const io = new Server(server, {
             message: `${user.username} has disconnected from the chat.`,
           });
         }
+        console.log("all users in room:", allUsers)
       });
 
       harperGetMessages()
