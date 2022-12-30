@@ -8,6 +8,8 @@ const harperSaveMessage = require('./services/harper-save-message');
 const harperGetMessages = require('./services/harper-get-messages'); 
 const leaveRoom = require('./utills/leave-room'); // Add this
 
+
+
 app.use(cors()); // Add cors middleware
 const server = http.createServer(app); 
 
@@ -23,7 +25,7 @@ const io = new Server(server, {
   let chatRoom = ''; // E.g. javascript, node,...
   let allUsers = []; // All users in current chat room 
   let allRoles = []; // All roles in current chat room
-  
+  let userInRoom = [];  
 
   // Listen for when the client connects via socket.io-client
   io.on('connection', (socket) => {
@@ -42,11 +44,9 @@ const io = new Server(server, {
       else if (allRoles.includes("mafia")){
         role = "mafia";
         allRoles.push(role);
-      }
+      } 
       socket.join(room); // Join the user to a socket room
-      
 
-      console.log(data);
       // Add this
       let __createdtime__ = Date.now(); // Current timestamp
       // Send message to all users currently in the room, apart from the user that just joined
@@ -76,27 +76,25 @@ const io = new Server(server, {
               .then((response) => console.log(response))
               .catch((err) => console.log(err));
           });
-
-
- 
       
-      socket.on('leave_room', (data) => {
-        const { username, room } = data;
-        socket.leave(room);
-        const __createdtime__ = Date.now();
-        // Remove user from memory
-        allUsers = leaveRoom(socket.id, allUsers);
-        socket.to(room).emit('chatroom_users', allUsers);
-        socket.to(room).emit('receive_message', {
-          username: CHAT_BOT,
-          message: `${username} has left the chat`,
-          __createdtime__,
-        });
-        console.log(`${username} has left the chat`);
-      });
+          socket.on('leave_room', (data) => {
+            const { username, room } = data;
+            socket.leave(room);
+            const __createdtime__ = Date.now();
+            // Remove user from memory
+            allUsers = leaveRoom(socket.id, allUsers);
+            socket.to(room).emit('chatroom_users', allUsers);
+            socket.to(room).emit('receive_message', {
+              username: CHAT_BOT,
+              message: `${username} has left the chat`,
+              __createdtime__,
+            });
+            console.log(`${username} has left the chat`);
+          });
 
       socket.on('disconnect', () => {
         console.log('User disconnected from the chat');
+        
         const user = allUsers.find((user) => user.id == socket.id);
         if (user?.username) {
           allUsers = leaveRoom(socket.id, allUsers);

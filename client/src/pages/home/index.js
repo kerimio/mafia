@@ -8,6 +8,9 @@ const Home = ({ username, setUsername, room, setRoom, socket }) => {
       const role = setRole();
       console.log(username + " " + "role is: " + role);
       socket.emit('join_room', { username, room, role });
+      localStorage.setItem("username", username);
+      localStorage.setItem("room", room);
+      localStorage.setItem("role", role);
     }
     navigate('../chat', { replace: true });
   };

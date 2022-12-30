@@ -2,6 +2,7 @@ import './App.css';
 import { useState } from 'react';
 import Home from './pages/home';
 import Chat from './pages/chat';
+import RoleRoom from './pages/roleRoom';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import io from 'socket.io-client';
 
@@ -41,6 +42,10 @@ function App() {
           <Route
             path='/chat'
             element={<Chat username={username} room={room} socket={socket} />}
+          />
+          <Route
+            path='/roleRoom'
+            element={<RoleRoom username={username} room={room} socket={socket}/>}
           />
         </Routes>
       </div>
