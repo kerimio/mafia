@@ -25,7 +25,8 @@ const io = new Server(server, {
   let chatRoom = ''; // E.g. javascript, node,...
   let allUsers = []; // All users in current chat room 
   let allRoles = []; // All roles in current chat room
-  let userInRoom = [];  
+  let readyCount = 0; // Keep track of the ready count
+
 
   // Listen for when the client connects via socket.io-client
   io.on('connection', (socket) => {
@@ -69,6 +70,8 @@ const io = new Server(server, {
       socket.emit('chatroom_users', chatRoomUsers);
         });
 
+
+
         socket.on('send_message', (data) => {
             const { message, username, room, __createdtime__ } = data;
             io.in(room).emit('receive_message', data); // Send to all users in room, including sender
@@ -90,6 +93,16 @@ const io = new Server(server, {
               __createdtime__,
             });
             console.log(`${username} has left the chat`);
+          });
+
+          socket.on('ready', (data) => {
+            const { room } = data;
+          
+            // Increment the readyCount variable
+            readyCount += 1;
+            socket.to(room).emit('ready_count', { count: readyCount });
+            socket.emit('ready_count', { count: readyCount });
+            console.log(readyCount);
           });
 
       socket.on('disconnect', () => {
@@ -115,4 +128,4 @@ const io = new Server(server, {
   });
 
 
-server.listen(4000, () => 'Server is running on port 3000');
+server.listen(4000, () => 'Server is running on port 3000'); 

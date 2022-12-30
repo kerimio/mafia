@@ -12,9 +12,9 @@ const Home = ({ username, setUsername, room, setRoom, socket }) => {
       localStorage.setItem("room", room);
       localStorage.setItem("role", role);
     }
-    navigate('../chat', { replace: true });
-  };
-
+    navigate('../chat', { replace: true});
+  }; 
+  
  
   function setRole() { 
     const role = ["mafia", "volk"];
