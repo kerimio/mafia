@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom'
 
 
 const WelcomeScreen = ({username, setUsername, room, setRoom, socket})  =>{
-    console.log("hi")
-    console.log("username: " + username);
-    console.log("room: " + room);
+    console.log("Welcome Screen :)")
+    console.log("room: ", room);
 
   const navigate = useNavigate();
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import WelcomeScreen from './components/Welcome/WelcomeScreen';
-import Room from './components/Room';
+import Room from './components/Room/Room';
 
 
 import io from 'socket.io-client';
@@ -22,14 +22,14 @@ const App= () => {
             path='/'
             element={
               <WelcomeScreen
-              username = {username}
-              setUsername = {setUsername}
-              room = {room}
-              setRoom = {setRoom}
+              username={username}
+              setUsername={setUsername}
+              room={room}
+              setRoom={setRoom}
               />
             }
           />
-     {<Route path='Room' element={<Room/>}></Route>}   
+     {<Route path='Room' element={<Room username={username} room={room}/>}></Route>}   
 
       </Routes>
     </Router>
