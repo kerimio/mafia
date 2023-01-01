@@ -29,7 +29,7 @@ const App= () => {
               />
             }
           />
-     {<Route path='Room' element={<Room user={user} room={room} socket={socket} />}></Route>}   
+     {<Route path='/Room' element={<Room user={user} room={room} socket={socket} />}></Route>}   
 
       </Routes>
     </Router>

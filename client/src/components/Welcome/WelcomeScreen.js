@@ -10,13 +10,10 @@ const WelcomeScreen = ({user, setUser, room, setRoom, socket})  =>{
 
 const joinRoom  = () => {
   if (room !== '' && user !== '') {
-  console.log("joining the room");
   socket.emit('join_room', {user, room});
   navigate('/Room', {replace: true});
   }
 }
-
-
   return (
     <div>
       <h1>Welcome to Mafia Game</h1>
