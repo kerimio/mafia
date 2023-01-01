@@ -1,16 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react';
+import { Socket } from 'socket.io-client';
 
 
-const WelcomeScreen = ({username, setUsername, room, setRoom, socket})  =>{
-    console.log("Welcome Screen :)")
-    console.log("room: ", room);
 
+const WelcomeScreen = ({user, setUser, room, setRoom, socket})  =>{
   const navigate = useNavigate();
 
 const joinRoom  = () => {
-  if (room !== '' && username !== '') {
+  if (room !== '' && user !== '') {
   console.log("joining the room");
+  socket.emit('join_room', {user, room});
   navigate('/Room', {replace: true});
   }
 }
@@ -20,10 +21,10 @@ const joinRoom  = () => {
     <div>
       <h1>Welcome to Mafia Game</h1>
      <label>
-  Enter your username:
+  Enter your user:
   <input
-    placeholder="Username..."
-    onChange={(e) => setUsername(e.target.value)}
+    placeholder="user..."
+    onChange={(e) => setUser(e.target.value)}
   />
 </label>
 <br />

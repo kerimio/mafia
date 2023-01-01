@@ -11,9 +11,8 @@ const socket = io.connect('http://localhost:4000');
 
 const App= () => {
 
-  const [username, setUsername] = useState('');
+  const [user, setUser] = useState('');
   const [room, setRoom] = useState(''); 
-
 
   return (
     <Router>
@@ -22,14 +21,15 @@ const App= () => {
             path='/'
             element={
               <WelcomeScreen
-              username={username}
-              setUsername={setUsername}
+              user={user}
+              setUser={setUser}
               room={room}
               setRoom={setRoom}
+              socket={socket}
               />
             }
           />
-     {<Route path='Room' element={<Room username={username} room={room}/>}></Route>}   
+     {<Route path='Room' element={<Room user={user} room={room} socket={socket} />}></Route>}   
 
       </Routes>
     </Router>
