@@ -21,6 +21,8 @@ const io = new Server(server, {
     },
   });
 
+  const readyCounters = new Map();
+
   io.on('connection', (socket) => {
     console.log("user with the userId: ", socket.id, " connected");
     socket.on('join_room', (data) => {
@@ -31,18 +33,20 @@ const io = new Server(server, {
       chatRoomUsers = allUsers.filter((user) => user.room === room);
       io.to(room).emit('chatroom_users', chatRoomUsers);
       socket.emit('chatroom_users', chatRoomUsers);
-      readyCounter[room] = readyCounter[room] || 0;
-      io.to(room).emit('ready_users', readyCounter[room]) // initialize readyCounter[room] as 0
+      if (!readyCounters.has(room)) {
+        readyCounters.set(room, 0);
+      }
+      io.to(room).emit('ready_users', readyCounters.get(room)); // initialize readyCounter[room] as 0
     });
   
     socket.on('ready', (data) => {
       const { room } = data;
       console.log(data);
       if (!socket.ready) {
-        readyCounter[room] += 1;
+        readyCounters.set(room, readyCounters.get(room) + 1);;
         socket.ready = true;
-        console.log("readyCounter: ", readyCounter[room]);
-        io.to(data.room).emit('ready_users', readyCounter[room]);
+        console.log("readyCounter: ", readyCounters.get(room));
+        io.to(data.room).emit('ready_users', readyCounters.get(room));
       }
     });
   
@@ -51,13 +55,15 @@ const io = new Server(server, {
       console.log(data.user, "has disconnected")
       // Subtract one from the readyCounter
       socket.ready = false;
-      readyCounter[data.room] = readyCounter[data.room] - 1;
-      if (readyCounter[data.room] < 0) {
-        readyCounter[data.room] = 0;
-      }
-      console.log("readyCounter: ", readyCounter[data.room]);
-      // Emit the updated readyCounter to all clients in the same room
-      io.to(data.room).emit('ready_users', readyCounter[data.room]);
+
+      const disconnectedUser = allUsers.find((user) => user.id === socket.id);
+       // Decrement the ready counter for the room if the user was in a room
+  if (disconnectedUser && readyCounters.has(disconnectedUser.room)) {
+    readyCounters.set(disconnectedUser.room, readyCounters.get(disconnectedUser.room) - 1);
+      console.log("readyCounter: ", readyCounters.get(disconnectedUser.room))
+    // Emit the updated ready counter for the room to all clients in the room
+    io.to(disconnectedUser.room).emit('ready_users', readyCounters.get(disconnectedUser.room));
+  }
     });
   });
 server.listen(4000, () => 'Server is running on port 3000'); 
