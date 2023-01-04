@@ -10,7 +10,7 @@ const harperGetMessages = require('./services/harper-get-messages');
 
 
 let allUsers = [];
-let readyCounter = 0;
+let readyCounter = {};
 app.use(cors()); // Add cors middleware
 const server = http.createServer(app); 
 
@@ -22,7 +22,6 @@ const io = new Server(server, {
   });
 
   io.on('connection', (socket) => {
-
     console.log("user with the userId: ", socket.id, " connected");
     socket.on('join_room', (data) => {
       const { user, room } = data; // Data sent from client when join_room event emitted
@@ -32,15 +31,33 @@ const io = new Server(server, {
       chatRoomUsers = allUsers.filter((user) => user.room === room);
       io.to(room).emit('chatroom_users', chatRoomUsers);
       socket.emit('chatroom_users', chatRoomUsers);
+      readyCounter[room] = readyCounter[room] || 0;
+      io.to(room).emit('ready_users', readyCounter[room]) // initialize readyCounter[room] as 0
     });
-
+  
     socket.on('ready', (data) => {
+      const { room } = data;
       console.log(data);
-      readyCounter += 1;
-      console.log("readyCounter: ", readyCounter);
-      io.to(data.room).emit('ready_users', readyCounter);
+      if (!socket.ready) {
+        readyCounter[room] += 1;
+        socket.ready = true;
+        console.log("readyCounter: ", readyCounter[room]);
+        io.to(data.room).emit('ready_users', readyCounter[room]);
+      }
     });
-
- 
+  
+    socket.on('disconnect', (data) => {
+      console.log("this is the data: ", data);
+      console.log(data.user, "has disconnected")
+      // Subtract one from the readyCounter
+      socket.ready = false;
+      readyCounter[data.room] = readyCounter[data.room] - 1;
+      if (readyCounter[data.room] < 0) {
+        readyCounter[data.room] = 0;
+      }
+      console.log("readyCounter: ", readyCounter[data.room]);
+      // Emit the updated readyCounter to all clients in the same room
+      io.to(data.room).emit('ready_users', readyCounter[data.room]);
+    });
   });
 server.listen(4000, () => 'Server is running on port 3000'); 

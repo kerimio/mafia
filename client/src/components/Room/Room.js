@@ -18,15 +18,21 @@ const Room = ({user, room, socket}) => {
     socket.on('ready_users', (data) => {
       console.log("ready: ", data);
       setReadyUsers(data);
+      console.log("chatroomusers length",chatRoomUsers);
+      if(readyUsers == chatRoomUsers.length){
+        console.log("all users are ready");
+      }
     });
   }, [socket]);
 
   let isReady = false;
   const ready = () => {
+    console.log(user,isReady)
   if (isReady === false){
     socket.emit('ready', {user, room});
+    isReady = true;
   }
-  isReady = true;
+
   }
 
 
@@ -45,6 +51,7 @@ const Room = ({user, room, socket}) => {
         ))}
         <button onClick={ready}> I'm ready! </button>
         <p> Ready Users {readyUsers} </p>
+        <p></p>
       </ul>
     </div>
   );
